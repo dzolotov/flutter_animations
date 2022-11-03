@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animations/pages/showcase_page_1.dart';
+import 'package:flutter_animations/pages/showcase_page_5.dart';
 
 import '../../strings.dart';
 import 'common/showcase_config.dart';
 import 'common/showcase_title.dart';
-import 'showcase_page_1.dart';
 import 'showcase_page_2.dart';
 import 'showcase_page_3.dart';
 import 'showcase_page_4.dart';
-import 'showcase_page_5.dart';
 import 'showcase_page_6.dart';
 import 'showcase_page_7.dart';
+import 'showcase_page_8.dart';
+import 'showcase_page_9.dart';
 
 /// Main page with list of showcases
 class HomePage extends StatelessWidget {
@@ -17,9 +19,11 @@ class HomePage extends StatelessWidget {
 
   /// all showcases
   static const showcases = <String, Widget>{
+    'SimpleAnimation': ShowcaseSimpleAnimation(),
     'AnimatedContainer': ShowcaseAnimatedContainer(),
     'TweenAnimationBuilder': ShowcaseTweenAnimationBuilder(),
     'AnimatedVisibility': ShowcaseAnimatedVisibility(),
+    'TweenSequence': ShowcaseTweenSequence(),
     'AnimatedPulse': ShowcaseAnimatedPulse(),
     'AnimatedBouncy': ShowcaseAnimatedBouncy(),
     'AnimatedHeroStatsGraph': ShowcaseAnimatedHeroStatsGraph(),
@@ -93,7 +97,7 @@ class _HomeListItem extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.all(12.0),
+          contentPadding: const EdgeInsets.all(4.0),
           leading: Chip(
             label: Text(
               (index + 1).toString(),

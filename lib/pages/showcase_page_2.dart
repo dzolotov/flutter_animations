@@ -1,38 +1,26 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import '../../strings.dart';
 import 'common/showcase_config.dart';
 import 'common/showcase_scaffold.dart';
 
-/// Showcase of [TweenAnimationBuilder] usage
-class ShowcaseTweenAnimationBuilder extends StatefulWidget {
-  const ShowcaseTweenAnimationBuilder({
+/// Showcase of [AnimatedContainer] usage
+class ShowcaseAnimatedContainer extends StatefulWidget {
+  const ShowcaseAnimatedContainer({
     Key? key,
   }) : super(key: key);
 
   @override
-  _ShowcaseTweenAnimationBuilderState createState() =>
-      _ShowcaseTweenAnimationBuilderState();
+  _ShowcaseAnimatedContainerState createState() =>
+      _ShowcaseAnimatedContainerState();
 }
 
-class _ShowcaseTweenAnimationBuilderState
-    extends State<ShowcaseTweenAnimationBuilder> {
-  static final initial = Tween(begin: 0.0, end: 0.0);
-  static final forward = Tween(begin: 0.0, end: pi);
-  static final reverse = Tween(begin: pi, end: 0.0);
-
-  var tween = initial;
+class _ShowcaseAnimatedContainerState extends State<ShowcaseAnimatedContainer> {
+  bool value = true;
 
   void toggle() {
     setState(() {
-      if (tween == initial) {
-        tween = forward;
-      } else if (tween == forward) {
-        tween = reverse;
-      } else {
-        tween = forward;
-      }
+      value = !value;
     });
   }
 
@@ -40,19 +28,30 @@ class _ShowcaseTweenAnimationBuilderState
   Widget build(BuildContext context) {
     return ShowcaseScaffold(
       onRun: toggle,
-      child: TweenAnimationBuilder(
+      child: AnimatedContainer(
         duration: ShowcaseConfig.of(context).duration,
         curve: Curves.easeIn,
-        tween: tween,
-        builder: (BuildContext context, double value, Widget? child) {
-          return Transform.rotate(
-            angle: value,
-            child: child ?? const SizedBox.shrink(),
-          );
-        },
-        child: const Icon(
-          Icons.arrow_upward_rounded,
-          size: 56.0,
+        width: value ? 120.0 : 80.0,
+        height: value ? 120.0 : 80.0,
+        decoration: BoxDecoration(
+          color: value ? Colors.cyan : Colors.grey.shade300,
+          boxShadow: value
+              ? [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    offset: const Offset(3.0, 3.0),
+                    blurRadius: 3.0,
+                    spreadRadius: 3.0,
+                  ),
+                ]
+              : null,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            value ? Strings.on : Strings.off,
+            style: Theme.of(context).primaryTextTheme.headline6,
+          ),
         ),
       ),
     );

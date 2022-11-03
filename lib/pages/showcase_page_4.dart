@@ -2,87 +2,94 @@ import 'package:flutter/material.dart';
 
 import 'common/showcase_config.dart';
 import 'common/showcase_scaffold.dart';
-import 'common/widgets.dart';
 
-/// Showcase of custom [AnimatedPulse]
-class ShowcaseAnimatedPulse extends StatelessWidget {
-  const ShowcaseAnimatedPulse({
+/// Showcase of [AnimatedVisibility]
+class ShowcaseAnimatedVisibility extends StatefulWidget {
+  const ShowcaseAnimatedVisibility({
     Key? key,
   }) : super(key: key);
+
+  @override
+  _ShowcaseAnimatedVisibilityState createState() =>
+      _ShowcaseAnimatedVisibilityState();
+}
+
+class _ShowcaseAnimatedVisibilityState
+    extends State<ShowcaseAnimatedVisibility> {
+  bool value = true;
+
+  void onRun() {
+    setState(() {
+      value = !value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final config = ShowcaseConfig.of(context);
 
     return ShowcaseScaffold(
-      onRun: null,
-      child: AnimatedPulse(
-        radius: 24.0,
-        color: Colors.red,
+      onRun: onRun,
+      child: AnimatedVisibility(
         duration: config.duration,
+        curve: Curves.easeIn,
+        isVisible: value,
+        child: FloatingActionButton(
+          child: const Icon(Icons.flutter_dash),
+          onPressed: () {},
+        ),
       ),
     );
   }
 }
 
-class AnimatedPulse extends StatefulWidget {
+/// Animates visibility of the [child] by applying scale and fade transition
+class AnimatedVisibility extends StatefulWidget {
   final Duration duration;
-  final Color color;
-  final double radius;
+  final bool isVisible;
+  final Widget child;
+  final Curve curve;
 
-  const AnimatedPulse({
-    required this.color,
-    required this.radius,
-    required this.duration,
+  const AnimatedVisibility({
     Key? key,
+    required this.child,
+    required this.isVisible,
+    required this.duration,
+    this.curve = Curves.linear,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _AnimatedPulseState();
+  _AnimatedVisibilityState createState() => _AnimatedVisibilityState();
 }
 
-class _AnimatedPulseState extends State<AnimatedPulse>
+class _AnimatedVisibilityState extends State<AnimatedVisibility>
     with SingleTickerProviderStateMixin {
   late final controller = AnimationController(
     duration: widget.duration,
+    value: widget.isVisible ? 1.0 : 0.0,
     vsync: this,
   );
 
-  late final innerUpscale = CurvedAnimation(
+  late final animation = CurvedAnimation(
     parent: controller,
-    curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
-  ).drive(Tween(begin: 1.0, end: 1.5));
-
-  late final innerDownscale = CurvedAnimation(
-    parent: controller,
-    curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
-  ).drive(Tween(begin: 1.0, end: 1.0 / 1.5));
-
-  // late final innerScale = MultiplyAnimation(innerUpscale, innerDownscale);
-
-  late final outerFade = Tween(begin: 1.0, end: 0.0).animate(controller);
-  late final outerScale = Tween(begin: 1.0, end: 3.0).animate(controller);
+    curve: widget.curve,
+  );
 
   @override
-  void initState() {
-    super.initState();
-    setDuration(widget.duration);
-  }
-
-  @override
-  void didUpdateWidget(covariant AnimatedPulse oldWidget) {
+  void didUpdateWidget(covariant AnimatedVisibility oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.duration != oldWidget.duration) {
-      setDuration(widget.duration);
+      controller.duration = widget.duration;
     }
-  }
-
-  void setDuration(Duration duration) {
-    controller.duration = duration;
-    if (duration > Duration.zero) {
-      controller.repeat();
-    } else {
-      controller.reset();
+    if (widget.curve != oldWidget.curve) {
+      animation.curve = widget.curve;
+    }
+    if (widget.isVisible != oldWidget.isVisible) {
+      if (widget.isVisible) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
     }
   }
 
@@ -94,39 +101,95 @@ class _AnimatedPulseState extends State<AnimatedPulse>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        FadeTransition(
-          opacity: outerFade,
-          child: ScaleTransition(
-            scale: outerScale,
-            child: ColoredCircle(
-              radius: widget.radius,
-              color: widget.color,
-            ),
-          ),
+    return IgnorePointer(
+      ignoring: !widget.isVisible,
+      child: ScaleTransition(
+        scale: animation,
+        child: FadeTransition(
+          opacity: animation,
+          child: widget.child,
         ),
-        ScaleTransition(
-          scale: innerUpscale,
-          child: ScaleTransition(
-            scale: innerDownscale,
-            child: ColoredCircle(
-              radius: widget.radius,
-              color: widget.color,
-            ),
-          ),
-        )
-      ],
+      ),
     );
+
+    // return IgnorePointer(
+    //   ignoring: !widget.isVisible,
+    //   child: AnimatedBuilder(
+    //     animation: animation,
+    //     builder: (BuildContext context, Widget? child) {
+    //       return ClipPath(
+    //         clipper: _CircleClipper(animation.value),
+    //         child: widget.child,
+    //       );
+    //     },
+    //   ),
+    // );
+
+    // return IgnorePointer(
+    //   ignoring: !widget.isVisible,
+    //   child: CircleClipTransition(
+    //     animation: animation,
+    //     child: widget.child,
+    //   ),
+    // );
   }
 }
 
-class MultiplyAnimation extends CompoundAnimation<double> {
-  MultiplyAnimation(
-    Animation<double> first,
-    Animation<double> next,
-  ) : super(first: first, next: next);
+/// Clips circular path with radius of shortest side multiplied by [factor]
+class _CircleClipper extends CustomClipper<Path> {
+  final double factor;
+
+  _CircleClipper(this.factor);
 
   @override
-  double get value => first.value * next.value;
+  Path getClip(Size size) {
+    final path = Path();
+
+    final center = size.center(Offset.zero);
+    final r = size.shortestSide * factor;
+
+    path.addRRect(
+      RRect.fromLTRBR(
+        center.dx - r,
+        center.dy - r,
+        center.dx + r,
+        center.dy + r,
+        Radius.circular(r),
+      ),
+    );
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+    if (oldClipper.runtimeType != _CircleClipper) {
+      return true;
+    }
+    final typedOldClipper = oldClipper as _CircleClipper;
+    return typedOldClipper.factor != factor;
+  }
+}
+
+/// Circle clip transition
+class CircleClipTransition extends AnimatedWidget {
+  final Widget child;
+
+  const CircleClipTransition({
+    required this.child,
+    required Animation<double> animation,
+    Key? key,
+  }) : super(
+          listenable: animation,
+          key: key,
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    final factor = listenable as Animation<double>;
+    return ClipPath(
+      clipper: _CircleClipper(factor.value),
+      child: child,
+    );
+  }
 }

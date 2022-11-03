@@ -1,101 +1,75 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 
+import 'common/showcase_config.dart';
 import 'common/showcase_scaffold.dart';
-import 'common/showcase_utils.dart';
-import 'common/widgets.dart';
 
-/// Showcase of [AnimatedBouncy] usage
-class ShowcaseAnimatedBouncy extends StatefulWidget {
-  const ShowcaseAnimatedBouncy({
+/// Showcase of [TweenSequence] usage
+class ShowcaseTweenSequence extends StatefulWidget {
+  const ShowcaseTweenSequence({
     Key? key,
   }) : super(key: key);
 
   @override
-  _ShowcaseAnimatedBouncyState createState() => _ShowcaseAnimatedBouncyState();
+  _ShowcaseTweenSequenceState createState() => _ShowcaseTweenSequenceState();
 }
 
-class _ShowcaseAnimatedBouncyState extends State<ShowcaseAnimatedBouncy> {
-  @override
-  Widget build(BuildContext context) {
-    return const ShowcaseScaffold(
-      onRun: null,
-      child: AnimatedBouncy(
-        child: ColoredCircle(
-          radius: 64,
-          color: Colors.indigo,
-        ),
-      ),
-    );
-  }
-}
-
-class AnimatedBouncy extends StatefulWidget {
-  final Widget child;
-
-  const AnimatedBouncy({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
-
-  @override
-  _AnimatedBouncyState createState() => _AnimatedBouncyState();
-}
-
-class _AnimatedBouncyState extends State<AnimatedBouncy>
+class _ShowcaseTweenSequenceState extends State<ShowcaseTweenSequence>
     with SingleTickerProviderStateMixin {
-  late final controller = AnimationController.unbounded(vsync: this);
-
-  final tween = Tween(begin: Offset.zero, end: Offset.zero);
-
-  late final animation = tween.animate(controller);
-
-  var offset = Offset.zero;
+  late AnimationController animationController;
+  TweenSequence? sequence;
 
   @override
-  void initState() {
-    super.initState();
-    animation.addListener(() {
-      setState(() {
-        offset = animation.value;
-      });
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    animationController = AnimationController(
+        duration: ShowcaseConfig.of(context).duration, vsync: this);
+
+    sequence = TweenSequence([
+      TweenSequenceItem(
+        tween: tween1,
+        weight: 1,
+      ),
+      TweenSequenceItem(
+        tween: tween2,
+        weight: 2,
+      ),
+      TweenSequenceItem(
+        tween: tween3,
+        weight: 1,
+      ),
+    ])
+      ..animate(animationController);
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    animationController.dispose();
     super.dispose();
   }
 
+  final tween1 = ColorTween(begin: Colors.red, end: Colors.green);
+  final tween2 = ColorTween(begin: Colors.green, end: Colors.blue);
+  final tween3 = ColorTween(begin: Colors.blue, end: Colors.red);
+
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: offset,
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          controller.stop();
-          setState(() {
-            offset = offset.translate(details.delta.dx, details.delta.dy);
-          });
-        },
-        onPanEnd: (details) {
-          tween.begin = offset;
-          controller.animateWith(
-            SpringSimulation(
-              SpringDescription.withDampingRatio(
-                mass: 1.0,
-                stiffness: PhysicsHelper.stiffness.medium,
-                ratio: PhysicsHelper.dampingRatio.highBouncy,
-              ),
-              0.0,
-              1.0,
-              0.0,
-              tolerance: PhysicsHelper.flingTolerance,
+    return ShowcaseScaffold(
+      onRun: () {
+        animationController.forward();
+      },
+      child: AnimatedBuilder(
+        animation: animationController,
+        builder: (context, child) => Center(
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: ColoredBox(
+              color: sequence!.evaluate(animationController),
             ),
-          );
-        },
-        child: widget.child,
+          ),
+        ),
       ),
     );
   }
