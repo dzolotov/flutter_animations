@@ -75,9 +75,8 @@ class _AnimatedBouncyState extends State<AnimatedBouncy>
       child: GestureDetector(
         onPanUpdate: (details) {
           controller.stop();
-          setState(() {
-            offset = offset.translate(details.delta.dx, details.delta.dy);
-          });
+          setState(() =>
+              offset = offset.translate(details.delta.dx, details.delta.dy));
         },
         onPanEnd: (details) {
           tween.begin = offset;

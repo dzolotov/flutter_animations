@@ -14,7 +14,7 @@ class ShowcaseSimpleAnimation extends StatefulWidget {
 
 class _ShowcaseSimpleAnimationState extends State<ShowcaseSimpleAnimation> {
   Offset offset = Offset.zero;
-  Offset direction = const Offset(1, 1);
+  Offset direction = const Offset(3, 3);
   Size size = const Size(64, 64);
 
   void _animationStep(double width, double height) {

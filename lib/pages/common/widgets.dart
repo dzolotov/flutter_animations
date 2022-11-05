@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class ColoredCircle extends StatelessWidget {
   final double radius;

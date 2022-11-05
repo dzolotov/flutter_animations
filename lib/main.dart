@@ -13,12 +13,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // timeDilation = 8.0;
     return ShowcaseScope(
       child: MaterialApp(
         title: Strings.appTitle,
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          // pageTransitionsTheme: const PageTransitionsTheme(
+          // pageTransitionsTheme: PageTransitionsTheme(
           //   builders: {
           //     TargetPlatform.android: DropPageTransition(),
           //     TargetPlatform.fuchsia: DropPageTransition(),

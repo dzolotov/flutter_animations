@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../strings.dart';
-import 'common/showcase_config.dart';
 import 'common/showcase_scaffold.dart';
 
 /// Showcase of [AnimatedContainer] usage
@@ -28,9 +27,10 @@ class _ShowcaseAnimatedContainerState extends State<ShowcaseAnimatedContainer> {
   Widget build(BuildContext context) {
     return ShowcaseScaffold(
       onRun: toggle,
-      child: AnimatedContainer(
-        duration: ShowcaseConfig.of(context).duration,
-        curve: Curves.easeIn,
+      child: Container(
+        //todo: replace to AnimatedContainer
+        // duration: ShowcaseConfig.of(context).duration,
+        // curve: Curves.easeIn,
         width: value ? 120.0 : 80.0,
         height: value ? 120.0 : 80.0,
         decoration: BoxDecoration(

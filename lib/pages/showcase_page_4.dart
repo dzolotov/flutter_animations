@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'common/showcase_config.dart';
 import 'common/showcase_scaffold.dart';
 
 /// Showcase of [AnimatedVisibility]
@@ -26,19 +25,27 @@ class _ShowcaseAnimatedVisibilityState
 
   @override
   Widget build(BuildContext context) {
-    final config = ShowcaseConfig.of(context);
+    // final config = ShowcaseConfig.of(context);
 
     return ShowcaseScaffold(
       onRun: onRun,
-      child: AnimatedVisibility(
-        duration: config.duration,
-        curve: Curves.easeIn,
-        isVisible: value,
+      //todo: replace with AnimatedVisibility
+      child: Visibility(
+        visible: value,
         child: FloatingActionButton(
           child: const Icon(Icons.flutter_dash),
           onPressed: () {},
         ),
       ),
+      // child: AnimatedVisibility(
+      //   duration: config.duration,
+      //   curve: Curves.easeIn,
+      //   visible: value,
+      //   child: FloatingActionButton(
+      //     child: const Icon(Icons.flutter_dash),
+      //     onPressed: () {},
+      //   ),
+      // ),
     );
   }
 }
@@ -46,14 +53,14 @@ class _ShowcaseAnimatedVisibilityState
 /// Animates visibility of the [child] by applying scale and fade transition
 class AnimatedVisibility extends StatefulWidget {
   final Duration duration;
-  final bool isVisible;
+  final bool visible;
   final Widget child;
   final Curve curve;
 
   const AnimatedVisibility({
     Key? key,
     required this.child,
-    required this.isVisible,
+    required this.visible,
     required this.duration,
     this.curve = Curves.linear,
   }) : super(key: key);
@@ -66,7 +73,7 @@ class _AnimatedVisibilityState extends State<AnimatedVisibility>
     with SingleTickerProviderStateMixin {
   late final controller = AnimationController(
     duration: widget.duration,
-    value: widget.isVisible ? 1.0 : 0.0,
+    value: widget.visible ? 1.0 : 0.0,
     vsync: this,
   );
 
@@ -84,8 +91,8 @@ class _AnimatedVisibilityState extends State<AnimatedVisibility>
     if (widget.curve != oldWidget.curve) {
       animation.curve = widget.curve;
     }
-    if (widget.isVisible != oldWidget.isVisible) {
-      if (widget.isVisible) {
+    if (widget.visible != oldWidget.visible) {
+      if (widget.visible) {
         controller.forward();
       } else {
         controller.reverse();
@@ -102,7 +109,7 @@ class _AnimatedVisibilityState extends State<AnimatedVisibility>
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      ignoring: !widget.isVisible,
+      ignoring: !widget.visible,
       child: ScaleTransition(
         scale: animation,
         child: FadeTransition(
