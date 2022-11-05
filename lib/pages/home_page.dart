@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animations/pages/showcase_page_1.dart';
-import 'package:flutter_animations/pages/showcase_page_5.dart';
 
 import '../../strings.dart';
 import 'common/showcase_config.dart';
 import 'common/showcase_title.dart';
+import 'showcase_page_1.dart';
 import 'showcase_page_2.dart';
 import 'showcase_page_3.dart';
 import 'showcase_page_4.dart';
+import 'showcase_page_5.dart';
 import 'showcase_page_6.dart';
 import 'showcase_page_7.dart';
 import 'showcase_page_8.dart';
@@ -51,16 +51,14 @@ class HomePage extends StatelessWidget {
                     index: index,
                     title: showcase.key,
                     addDivider: index < _entries.length - 1,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ShowcaseTitle(
-                            title: showcase.key,
-                            child: showcase.value,
-                          ),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ShowcaseTitle(
+                          title: showcase.key,
+                          child: showcase.value,
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   );
                 },
               ),

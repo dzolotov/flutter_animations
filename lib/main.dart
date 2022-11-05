@@ -13,6 +13,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //makes all animations slower
     // timeDilation = 8.0;
     return ShowcaseScope(
       child: MaterialApp(

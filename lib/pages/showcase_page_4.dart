@@ -120,7 +120,7 @@ class _AnimatedVisibilityState extends State<AnimatedVisibility>
     );
 
     // return IgnorePointer(
-    //   ignoring: !widget.isVisible,
+    //   ignoring: !widget.visible,
     //   child: AnimatedBuilder(
     //     animation: animation,
     //     builder: (BuildContext context, Widget? child) {
@@ -133,7 +133,7 @@ class _AnimatedVisibilityState extends State<AnimatedVisibility>
     // );
 
     // return IgnorePointer(
-    //   ignoring: !widget.isVisible,
+    //   ignoring: !widget.visible,
     //   child: CircleClipTransition(
     //     animation: animation,
     //     child: widget.child,
